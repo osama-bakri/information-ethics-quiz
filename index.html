@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>اختبار: أخلاقيات المعلومات</title>
+<style>
+  :root{
+    --teal-dark:#1B3A4B;
+    --teal-mid:#4A918A;
+    --teal-light:#A3D1CD;
+    --teal-pale:#EAF3F3;
+    --yellow:#F5D547;
+    --red:#C0392B;
+    --green:#1E8449;
+    --ink:#20343D;
+    --muted:#5C7580;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:#F7FAF9; color:var(--ink);
+    font-family:"Segoe UI","Tahoma","Cairo","Arial",sans-serif;
+    line-height:1.65;
+    padding-bottom:80px;
+  }
+  header{
+    background:var(--teal-dark);
+    color:#fff;
+    padding:28px 20px 22px;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+  }
+  header::before{
+    content:"";
+    position:absolute; left:-60px; bottom:-70px;
+    width:180px; height:180px; border-radius:50%;
+    background:var(--teal-mid); opacity:.45;
+  }
+  header::after{
+    content:"";
+    position:absolute; right:-40px; top:-60px;
+    width:140px; height:140px; border-radius:50%;
+    background:var(--teal-mid); opacity:.3;
+  }
+  header h1{margin:0 0 6px; font-size:1.5rem; position:relative;}
+  header p{margin:0; color:var(--teal-light); font-size:.95rem; position:relative;}
+
+  .tag{
+    display:inline-block;
+    background:var(--yellow);
+    color:var(--teal-dark);
+    font-weight:700;
+    font-size:.8rem;
+    padding:4px 14px;
+    border-radius:20px;
+    margin-bottom:10px;
+    position:relative;
+  }
+
+  .progress-wrap{
+    max-width:720px; margin:16px auto 0; padding:0 16px;
+    position:relative; z-index:2;
+  }
+  .progress-card{
+    background:#fff; border-radius:14px;
+    box-shadow:0 6px 18px rgba(27,58,75,.15);
+    padding:14px 18px; display:flex; align-items:center; justify-content:space-between; gap:12px;
+  }
+  .progress-bar-bg{
+    flex:1; height:10px; background:var(--teal-pale); border-radius:6px; overflow:hidden;
+  }
+  .progress-bar-fill{
+    height:100%; width:0%; background:var(--teal-mid); border-radius:6px; transition:width .3s ease;
+  }
+  .score-badge{
+    font-weight:700; color:var(--teal-dark); font-size:.9rem; white-space:nowrap;
+    direction:ltr; unicode-bidi:isolate;
+  }
+
+  main{max-width:720px; margin:20px auto; padding:0 16px;}
+  section.exam{display:block;}
+
+  .exam-title{
+    font-size:1.15rem; font-weight:700; color:var(--teal-dark);
+    margin:6px 0 18px; padding-bottom:10px; border-bottom:2px solid var(--teal-pale);
+  }
+
+  .q-card{
+    background:#fff; border-radius:14px; padding:18px;
+    margin-bottom:16px; box-shadow:0 3px 10px rgba(27,58,75,.08);
+  }
+  .q-passage{
+    background:var(--teal-pale); border-radius:10px; padding:14px 16px;
+    font-size:.92rem; color:var(--ink); margin-bottom:14px;
+  }
+  .q-text{font-weight:700; font-size:.98rem; display:flex; align-items:flex-start; gap:0; margin-bottom:12px;}
+  .q-text span.txt{flex:1;}
+
+  .options{display:flex; flex-direction:column; gap:8px;}
+  .opt{
+    display:flex; align-items:center; gap:10px;
+    background:var(--teal-pale); border:2px solid transparent;
+    border-radius:10px; padding:10px 12px; cursor:pointer;
+    font-size:.92rem; transition:border-color .15s ease, background .15s ease;
+  }
+  .opt:hover{border-color:var(--teal-light);}
+  .opt.selected{border-color:var(--teal-mid); background:#fff;}
+  .opt.correct{background:#E9F7EF; border-color:var(--green); color:var(--green); font-weight:700;}
+  .opt.incorrect{background:#FDEDEC; border-color:var(--red); color:var(--red); font-weight:700;}
+  .opt input{accent-color:var(--teal-mid); width:16px; height:16px; flex-shrink:0;}
+
+  select.match-select, select.tf-select{
+    width:100%; padding:9px 10px; border-radius:8px; border:2px solid var(--teal-pale);
+    background:#fff; font-family:inherit; font-size:.9rem; color:var(--ink);
+  }
+  select.match-select.correct, select.tf-select.correct{border-color:var(--green); background:#E9F7EF;}
+  select.match-select.incorrect, select.tf-select.incorrect{border-color:var(--red); background:#FDEDEC;}
+
+  .match-row{
+    display:flex; align-items:center; gap:10px; margin-bottom:10px;
+    font-size:.9rem;
+  }
+  .match-row .stmt{flex:1;}
+  .match-row select{flex:0 0 180px;}
+
+  .tf-row{
+    margin-bottom:12px; padding:10px 12px; background:var(--teal-pale); border-radius:10px;
+  }
+  .tf-stmt{ font-size:.9rem; margin-bottom:8px; }
+
+  .manual-note{
+    font-size:.72rem; color:var(--muted); margin-top:6px;
+  }
+
+  textarea.short-ans{
+    width:100%; border:2px solid var(--teal-pale); border-radius:10px;
+    padding:10px; font-family:inherit; font-size:.9rem; resize:vertical; min-height:60px;
+  }
+
+  .feedback{
+    margin-top:10px; padding:10px 12px; border-radius:10px; font-size:.88rem; display:none;
+  }
+  .feedback.show{display:block;}
+  .feedback.ok{background:#E9F7EF; color:var(--green);}
+  .feedback.bad{background:#FDEDEC; color:var(--red);}
+  .feedback .explain{color:var(--muted); display:block; margin-top:4px; font-weight:400;}
+
+  .final-card{
+    background:var(--teal-dark); color:#fff; border-radius:16px; padding:26px 20px;
+    text-align:center; margin-top:10px;
+  }
+  .final-card .big{font-size:2.2rem; font-weight:800; color:var(--yellow); direction:ltr; unicode-bidi:isolate;}
+  .final-card .badge-emoji{font-size:2.8rem; line-height:1;}
+  .final-card .badge-label{font-weight:700; font-size:1rem; margin-top:4px; color:#fff;}
+  .final-card p{color:var(--teal-light); margin:6px 0 0;}
+
+  /* ---- name gate ---- */
+  #gate{
+    position:fixed; inset:0; background:var(--teal-dark); z-index:50;
+    display:flex; align-items:center; justify-content:center; padding:20px;
+  }
+  #gate .box{
+    background:#fff; border-radius:16px; padding:30px 24px; max-width:380px; width:100%;
+    text-align:center; box-shadow:0 10px 30px rgba(0,0,0,.25);
+  }
+  #gate .box h2{margin:0 0 6px; color:var(--teal-dark); font-size:1.2rem;}
+  #gate .box p{margin:0 0 18px; color:var(--muted); font-size:.88rem;}
+  #gate input{
+    width:100%; padding:12px 14px; border-radius:10px; border:2px solid var(--teal-pale);
+    font-family:inherit; font-size:.95rem; margin-bottom:12px; text-align:center;
+  }
+  #gate input:focus{outline:none; border-color:var(--teal-mid);}
+  #gate button{
+    width:100%; padding:12px; border:none; border-radius:10px; background:var(--teal-mid);
+    color:#fff; font-weight:700; font-size:.95rem; cursor:pointer; font-family:inherit;
+  }
+  #gate .err{color:var(--red); font-size:.8rem; margin-top:8px; display:none;}
+
+  .hello-bar{
+    max-width:720px; margin:14px auto 0; padding:0 16px;
+    text-align:center;
+    font-size:.9rem; color:var(--teal-dark);
+  }
+  .hello-bar b{color:var(--teal-mid);}
+
+  .submit-wrap{
+    max-width:720px; margin:20px auto 0; padding:0 16px 30px;
+    text-align:center;
+  }
+  .submit-result{
+    background:var(--yellow); color:var(--teal-dark); border:none; border-radius:10px;
+    padding:14px 32px; font-weight:700; font-size:.95rem; cursor:pointer; font-family:inherit;
+  }
+  @media (max-width:480px){
+    .submit-result{width:100%;}
+  }
+  .submit-status{
+    margin-top:12px; font-size:.85rem; display:none;
+  }
+  .submit-status.show{display:block;}
+  .submit-status.ok{color:var(--green);}
+  .submit-status.bad{color:var(--red);}
+
+  /* ---- teacher passcode overlay ---- */
+  #teacherGate{
+    position:fixed; inset:0; background:var(--teal-dark); z-index:60;
+    display:none; align-items:center; justify-content:center; padding:20px;
+  }
+  #teacherGate.show{display:flex;}
+  #teacherGate .box{
+    background:#fff; border-radius:16px; padding:30px 24px; max-width:380px; width:100%;
+    text-align:center; box-shadow:0 10px 30px rgba(0,0,0,.25);
+  }
+  #teacherGate .box h2{margin:0 0 6px; color:var(--teal-dark); font-size:1.15rem;}
+  #teacherGate .box p{margin:0 0 18px; color:var(--muted); font-size:.85rem;}
+  #teacherGate input{
+    width:100%; padding:12px 14px; border-radius:10px; border:2px solid var(--teal-pale);
+    font-family:inherit; font-size:.95rem; margin-bottom:12px; text-align:center; direction:ltr;
+  }
+  #teacherGate input:focus{outline:none; border-color:var(--teal-mid);}
+  #teacherGate button{
+    width:100%; padding:12px; border:none; border-radius:10px; background:var(--teal-mid);
+    color:#fff; font-weight:700; font-size:.95rem; cursor:pointer; font-family:inherit;
+  }
+  #teacherGate .err{color:var(--red); font-size:.8rem; margin-top:8px; display:none;}
+  #teacherGate .err.show{display:block;}
+
+  /* ---- teacher dashboard ---- */
+  #dashboard{display:none; max-width:720px; margin:20px auto; padding:0 16px;}
+  #dashboard.show{display:block;}
+  #dashboard .dash-card{
+    background:#fff; border-radius:14px; box-shadow:0 3px 10px rgba(27,58,75,.08);
+    overflow:hidden; margin-bottom:10px;
+  }
+  .student-card{
+    background:#fff; border-radius:14px; box-shadow:0 3px 10px rgba(27,58,75,.08);
+    margin-bottom:12px; overflow:hidden;
+  }
+  .student-head{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:14px 16px; flex-wrap:wrap;
+  }
+  .student-head .name{font-weight:700; color:var(--teal-dark); font-size:.95rem;}
+  .student-head .meta{font-size:.78rem; color:var(--muted);}
+  .student-head .score{font-weight:700; color:var(--teal-mid); direction:ltr; unicode-bidi:isolate;}
+  .toggle-answers-btn{
+    background:var(--teal-pale); color:var(--teal-dark); border:none; border-radius:8px;
+    padding:7px 14px; font-size:.78rem; font-weight:700; cursor:pointer; font-family:inherit;
+  }
+  .answers-panel{
+    display:none; border-top:1px solid var(--teal-pale); padding:14px 16px; background:#FAFCFC;
+  }
+  .answers-panel.show{display:block;}
+  .answer-item{margin-bottom:12px;}
+  .answer-item:last-child{margin-bottom:0;}
+  .answer-item .a-exam{font-size:.7rem; color:var(--teal-mid); font-weight:700; margin-bottom:2px;}
+  .answer-item .a-prompt{font-size:.82rem; color:var(--ink); margin-bottom:4px;}
+  .answer-item .a-response{
+    font-size:.85rem; color:var(--teal-dark); background:#fff; border:1px solid var(--teal-pale);
+    border-radius:8px; padding:8px 10px; white-space:pre-wrap;
+  }
+  .no-answers{font-size:.8rem; color:var(--muted);}
+  #dashboard .refresh-btn{
+    background:var(--teal-mid); color:#fff; border:none; border-radius:10px;
+    padding:9px 16px; font-weight:700; font-size:.85rem; cursor:pointer; font-family:inherit; margin-bottom:14px;
+  }
+  #dashboard .close-dash{
+    background:none; border:none; color:var(--muted); text-decoration:underline;
+    cursor:pointer; font-family:inherit; font-size:.82rem; margin-inline-start:10px;
+  }
+  #dashboard .empty{color:var(--muted); text-align:center; padding:20px; font-size:.85rem;}
+  #dashboard .clear-btn{
+    background:var(--red); color:#fff; border:none; border-radius:10px;
+    padding:9px 16px; font-weight:700; font-size:.85rem; cursor:pointer; font-family:inherit; margin-bottom:14px; margin-inline-start:8px;
+  }
+
+  @media (max-width:480px){
+    .match-row{flex-direction:column; align-items:stretch;}
+    .match-row select{flex:1;}
+  }
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="box">
+    <h2>قبل ما تبدأ 👋</h2>
+    <p>اكتب اسمك عشان نقدر نبعت نتيجتك للمدرّس بعد ما تخلّص</p>
+    <input type="text" id="nameInput" placeholder="اكتب اسمك بالكامل" autocomplete="name">
+    <button id="startBtn">ابدأ الاختبار</button>
+    <div class="err" id="nameErr">من فضلك اكتب اسمك الأول</div>
+  </div>
+</div>
+
+<div id="teacherGate">
+  <div class="box">
+    <h2>🔒 دخول المدرّس</h2>
+    <p>اكتب كلمة السر عشان تفتح لوحة نتائج الطلاب</p>
+    <input type="password" id="teacherPassInput" placeholder="كلمة السر">
+    <button id="teacherEnterBtn">دخول</button>
+    <div class="err" id="teacherErr">كلمة السر غير صحيحة</div>
+  </div>
+</div>
+
+<div id="dashboard">
+  <div class="exam-title">لوحة نتائج الطلاب</div>
+  <button class="refresh-btn" id="refreshDashBtn">تحديث النتائج</button>
+  <button class="clear-btn" id="clearDashBtn">مسح كل النتائج المحفوظة</button>
+  <button class="close-dash" id="closeDashBtn">إغلاق ورجوع للاختبار</button>
+  <div class="dash-card"><div id="dashContent" class="empty">اضغط "تحديث النتائج" لعرض تسليمات الطلاب...</div></div>
+</div>
+
+<div id="appRoot">
+<header>
+  <span class="tag">1-2 &nbsp;·&nbsp; أخلاقيات المعلومات</span>
+  <h1>اختبر نفسك في الدرس</h1>
+  <p>ثلاثة اختبارات متدرجة — أجب، وشوف تصحيحك فورًا</p>
+</header>
+
+<div class="hello-bar">
+  <span>أهلاً، <b id="helloName"></b></span>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-card">
+    <span class="score-badge" id="scoreLabel">0 / 0</span>
+    <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill"></div></div>
+  </div>
+</div>
+
+<main id="examsContainer"></main>
+</div>
+
+<script>
+/* ============================================================
+   Information Ethics Quiz - Standalone + Online Ready
+   - Auto-scores MCQ / TF / Matching
+   - Short answers collected for teacher review
+   - Results saved to localStorage (works offline + online)
+   - Optional Claude DB if available
+   - Teacher dashboard (type "teacher" or "مدرس" anywhere)
+   ============================================================ */
+
+const TEACHER_PASSCODE = "teacher2026";
+const STORAGE_KEY = "ethics_quiz_results_v1";
+
+/* ---------- DATA ---------- */
+const exams = [
+  {
+    id: "exam1",
+    title: "تحدى معلوماتك",
+    groups: [
+      {
+        kind: "short",
+        prompt: "ما هو المصطلح الذي يشير إلى المفاهيم والتوجهات الأساسية اللازمة للقيام بأنشطة مناسبة في مجتمع المعلومات؟",
+        answer: "أخلاقيات المعلومات (Information ethics)",
+      },
+      {
+        kind: "tf",
+        prompt: "بالنسبة للعبارات التالية، ضع علامة (✓) إذا كان البيان صحيحًا، و(×) إذا كان غير صحيح:",
+        rows: [
+          { text: "(أ) وسائل التواصل الاجتماعي ليست أكثر من أداة خطيرة تسبب المتاعب.", correct: "خطأ", feedback: "وسائل التواصل الاجتماعي أداة ملائمة تسمح للأفراد بالتواصل مع بعضهم، لكنها قد تكون خطيرة إذا لم تُستخدم بشكل صحيح." },
+          { text: "(ب) هناك خطر أن يتم التعرف على عنوان منزلك من العلامات الجغرافية المضمنة في الصور ومقاطع الفيديو.", correct: "صح" },
+          { text: "(ت) يمكنك كتابة ما تريد على لوحة إعلانات مجهولة الهوية لأنه لا يمكن لأحد أن يعرف من كتبها.", correct: "خطأ", feedback: "لا تنشر أبدًا محتوى قذف أو معلومات مضللة أو شائعات، حتى بشكل مجهول الهوية." },
+          { text: "(ث) كن مدركًا أن هناك أشخاصًا حقيقيين على الجانب الآخر من الإنترنت، وحاول مشاركة المعلومات مع مراعاة وجهة نظرهم.", correct: "صح" },
+        ],
+      },
+    ],
+  },
+  {
+    id: "exam2",
+    title: "جرب بنفسك",
+    groups: [
+      {
+        kind: "short",
+        prompt: "1) [1] أكمل الفراغ: (.....) هو المصطلح للمفاهيم والتوجهات الأساسية اللازمة للقيام بأنشطة مناسبة في مجتمع المعلومات.",
+        answer: "أخلاقيات المعلومات (Information ethics)",
+      },
+      {
+        kind: "short",
+        prompt: "[2] أكمل الفراغ: (.....) هو المصطلح للمعلومات الكاذبة التي يتم نشرها عمدًا أو الشائعات التي لا أساس لها.",
+        answer: "المعلومات المضللة والشائعات (Disinformation and rumors)",
+      },
+      {
+        kind: "short",
+        prompt: "[3] أكمل الفراغ: (.....) هو المصطلح الشامل للجرائم التي تنطوي على إساءة استخدام أجهزة الكمبيوتر والشبكات.",
+        answer: "الجريمة الإلكترونية (Cybercrime)",
+      },
+      {
+        kind: "passage",
+        text: "عند نقل المعلومات على الإنترنت، يجب أن تكون حذرًا جدًا في التعامل مع ([1].........) الآخرين ومع الصور أو مقاطع الفيديو التي يمتلك فيها الآخرون ([2].........). بالإضافة إلى ذلك، تحتوي الصور ومقاطع الفيديو التي تم التقاطها بهاتف ذكي على ميزة يمكنها إضافة معلومات مثل خط الطول وخط العرض للموقع الذي تم التقاطها فيه، والذي يُشار إليه باسم ([3].........). وهذا مريح لأنه يمكن من تأكيد أو البحث عن الموقع الذي تم التقاط الصورة فيه، ولكن هناك حاجة إلى الحذر حيث يوجد خطر من التعرف على عنوان منزلك.",
+      },
+      {
+        kind: "matchTerm",
+        prompt: "(2) اختر العبارات التي تناسب الفراغات [1] إلى [3] في القطعة السابقة:",
+        options: ["حقوق المؤلف (Copyright)", "المعلومات الشخصية (Personal Information)", "حقوق الملكية الصناعية (Industrial Property Rights)", "العلامة الجغرافية (Geotag)"],
+        rows: [
+          { text: "الفراغ [1]", correct: "المعلومات الشخصية (Personal Information)" },
+          { text: "الفراغ [2]", correct: "حقوق المؤلف (Copyright)" },
+          { text: "الفراغ [3]", correct: "العلامة الجغرافية (Geotag)" },
+        ],
+      },
+      {
+        kind: "mcq",
+        prompt: "(3) اختر المصطلح العام للخدمات التي توفر منصات للأفراد للتواصل مع بعضهم البعض على الإنترنت:",
+        options: [
+          "الهندسة الاجتماعية (Social engineering)",
+          "التسويق الاجتماعي (Social marketing)",
+          "خدمة الشبكة الاجتماعية (Social networking service)",
+          "نظام الشبكة الاجتماعية (Social network system)",
+        ],
+        correct: "خدمة الشبكة الاجتماعية (Social networking service)",
+      },
+      {
+        kind: "tf",
+        prompt: "(4) العبارات التالية تصف أخلاقيات المعلومات. ضع علامة (✓) إذا كان البيان مناسبًا، و(×) إذا كان غير مناسب:",
+        rows: [
+          { text: "(أ) يمكنك الكتابة بحرية على لوحة إعلانات مجهولة لأنه لا يمكن لأحد أن يعرف من كتبها.", correct: "خطأ" },
+          { text: "(ب) مواقع الويب ملزمة قانونيًا بتقديم معلومات دقيقة دائمًا.", correct: "خطأ" },
+          { text: "(ت) يجب أن تكون حذرًا ليس فقط مع معلوماتك الشخصية، ولكن أيضًا مع كيفية التعامل مع المعلومات الشخصية للآخرين.", correct: "صح" },
+          { text: "(ث) لأي محتوى، من الأفضل استخدام لوحة إعلانات لنشر المعلومات حيث يمكنها الوصول إلى جمهور أكبر.", correct: "خطأ" },
+        ],
+      },
+      {
+        kind: "mcq",
+        prompt: "(5) اختر عبارة واحدة مناسبة لأخلاقيات استخدام الهاتف الذكي:",
+        options: [
+          "قمت بتشغيل هاتف ذكي أثناء قيادة سيارتي.",
+          "قمت بإيقاف تشغيل الهاتف الذكي في أماكن مثل دور السينما أو المتاحف الفنية.",
+          "قمت بنشر تعليقات سلبية عن الآخرين على الإنترنت.",
+          "أرسلت صورتي إلى غريب قابلته عبر الإنترنت.",
+        ],
+        correct: "قمت بإيقاف تشغيل الهاتف الذكي في أماكن مثل دور السينما أو المتاحف الفنية.",
+      },
+    ],
+  },
+  {
+    id: "exam3",
+    title: "تمرين",
+    groups: [
+      {
+        kind: "short",
+        prompt: "1) [أ] أكمل الفراغ: (.....) هو المصطلح للحالة التي يُعطى فيها الشخص الأولوية لاستخدام الإنترنت على جوانب الحياة مثل الدراسات والعمل والصحة الجسدية والعقلية، وغير قادر على التحكم في الوقت المستغرق أو طريقة استخدام الإنترنت.",
+        answer: "إدمان الإنترنت (Internet Addiction)",
+      },
+      {
+        kind: "short",
+        prompt: "[ب] أكمل الفراغ: (.....) هو المصطلح الشامل للخدمات التي تسهل بناء العلاقات عبر الإنترنت.",
+        answer: "خدمة الشبكة الاجتماعية (SNS)",
+      },
+      {
+        kind: "short",
+        prompt: "[ج] أكمل الفراغ: (.....) هو المصطلح لمعلومات الموقع التي يمكن إضافتها إلى وسائط مختلفة مثل الصور ومقاطع الفيديو.",
+        answer: "العلامة الجغرافية (Geotag)",
+      },
+      {
+        kind: "passage",
+        text: "([1]........) هو المصطلح للمفاهيم والتوجهات الأساسية اللازمة للقيام بأنشطة مناسبة في مجتمع المعلومات. حتى لو لم يكن شيء ما محظورًا بواسطة ([2]........)، فلا يزال يجب عليك الامتناع عن الانخراط في سلوك غير لائق. علاوة على ذلك، فإن المعلومات على الإنترنت ([3]........) بسهولة، ومتى تم نشرها فإنها تميل ([4]........). مع أخذ كل هذا في الاعتبار، يجب أن نكون حذرين حتى لا ننخرط في جرائم أو سلوكيات إشكالية متعلقة بالإنترنت.",
+      },
+      {
+        kind: "matchTerm",
+        prompt: "(2) اختر العبارات التي تناسب الفراغات [1] إلى [4] في القطعة السابقة:",
+        options: [
+          "آداب المعلومات (Information etiquette)",
+          "أخلاقيات المعلومات (Information ethics)",
+          "الانتشار (Spread)",
+          "رد الفعل العنيف عبر الإنترنت (Online backlash)",
+          "إلى الاختفاء (To Disappear)",
+          "إلى عدم الاختفاء (Not To Disappear)",
+          "القوانين (Laws)",
+          "النظام (System)",
+        ],
+        rows: [
+          { text: "الفراغ [1]", correct: "أخلاقيات المعلومات (Information ethics)" },
+          { text: "الفراغ [2]", correct: "القوانين (Laws)" },
+          { text: "الفراغ [3]", correct: "الانتشار (Spread)" },
+          { text: "الفراغ [4]", correct: "إلى عدم الاختفاء (Not To Disappear)" },
+        ],
+      },
+      {
+        kind: "tf",
+        prompt: "(3) العبارات التالية تصف أخلاقيات المعلومات. ضع علامة (✓) إذا كان البيان مناسبًا، و(×) إذا كان غير مناسب:",
+        rows: [
+          { text: "(أ) عند التفاعل عبر الشبكة، من المهم التواصل بشكل مناسب لتجنب سوء الفهم.", correct: "صح" },
+          { text: "(ب) يمكنك الكتابة بحرية على لوحة إعلانات مجهولة لأنه لا يمكن لأحد أن يعرف من كتبها.", correct: "خطأ" },
+          { text: "(ت) مواقع الويب مطلوبة قانونيًا لتقديم معلومات دقيقة دائمًا.", correct: "خطأ" },
+          { text: "(ث) بما أن أحد المشاهير كان في مركز تسوق قريب، قمت بالتقاط صورة ومشاركتها على وسائل التواصل الاجتماعي. افترضت أن هذا أمر جيد بما أن الصورة التُقطت في مكان عام.", correct: "خطأ", feedback: "التقاط صورة لشخص ومشاركتها دون إذنه ينتهك خصوصيته، حتى لو التُقطت في مكان عام." },
+        ],
+      },
+      {
+        kind: "mcq",
+        prompt: "(4) اختر عبارة واحدة صحيحة فيما يتعلق باستخدام الإنترنت ووسائل التواصل الاجتماعي:",
+        options: [
+          "لا بأس بنسخ قرص مضغوط تجاري ونشره على وسائل التواصل الاجتماعي دون إذن.",
+          "وسائل التواصل الاجتماعي ليست أكثر من أداة خطيرة تسبب المتاعب.",
+          "إذا عشت حياة منفصلة عن الإنترنت، فلن تكون ضحية للجريمة الإلكترونية.",
+          "عند نشر المعلومات، تأكد من أنها لا تنتهك خصوصية الآخرين.",
+        ],
+        correct: "عند نشر المعلومات، تأكد من أنها لا تنتهك خصوصية الآخرين.",
+      },
+    ],
+  },
+];
+
+/* ---------- STATE ---------- */
+let studentName = "";
+let scoredItems = [];   // { type, getIsCorrect, getValue, prompt, examTitle, feedbackEl? }
+let shortItems = [];    // short answer fields
+
+function uid(prefix, i){ return prefix + "_" + i; }
+
+/* ---------- RENDER ---------- */
+const container = document.getElementById("examsContainer");
+
+exams.forEach((exam, ei) => {
+  const section = document.createElement("section");
+  section.className = "exam active";
+  section.id = exam.id;
+
+  const h = document.createElement("div");
+  h.className = "exam-title";
+  h.textContent = exam.title;
+  section.appendChild(h);
+
+  exam.groups.forEach((g, gi) => {
+    const gid = uid(exam.id + "_g", gi);
+    section.appendChild(renderGroup(g, gid, exam.title));
+  });
+
+  container.appendChild(section);
+});
+
+// final score card
+const finalWrap = document.createElement("div");
+finalWrap.className = "final-card";
+finalWrap.innerHTML = `
+  <div class="badge-emoji" id="badgeEmoji">🎯</div>
+  <div class="big" id="finalScore">0 / 0</div>
+  <div class="badge-label" id="badgeLabel"></div>
+  <p id="finalHint">الأسئلة الموضوعية تُصحح فورًا — الإجابات القصيرة يراجعها المدرّس</p>
+`;
+container.appendChild(finalWrap);
+
+// submit
+const submitWrap = document.createElement("div");
+submitWrap.className = "submit-wrap";
+submitWrap.innerHTML = `
+  <button class="submit-result" id="submitResultBtn">إرسال نتيجتي للمدرّس</button>
+  <div class="submit-status" id="submitStatus"></div>
+`;
+container.appendChild(submitWrap);
+
+updateScore();
+
+/* ---------- RENDER HELPERS ---------- */
+function renderGroup(g, gid, examTitle){
+  const card = document.createElement("div");
+
+  if(g.kind === "passage"){
+    card.className = "q-passage";
+    card.textContent = g.text;
+    return card;
+  }
+
+  card.className = "q-card";
+
+  if(g.kind === "mcq"){
+    const qtext = document.createElement("div");
+    qtext.className = "q-text";
+    qtext.innerHTML = `<span class="txt">${g.prompt}</span>`;
+    card.appendChild(qtext);
+
+    const opts = document.createElement("div");
+    opts.className = "options";
+    let selectedIdx = -1;
+
+    const feedback = document.createElement("div");
+    feedback.className = "feedback";
+
+    g.options.forEach((optText, oi) => {
+      const opt = document.createElement("label");
+      opt.className = "opt";
+      opt.innerHTML = `<input type="radio" name="${gid}"> <span>${optText}</span>`;
+      const input = opt.querySelector("input");
+      input.onchange = () => {
+        selectedIdx = oi;
+        opts.querySelectorAll(".opt").forEach((o,i)=> {
+          o.classList.remove("selected","correct","incorrect");
+          if(i === oi) o.classList.add("selected");
+        });
+        // live feedback
+        const isCorrect = optText === g.correct;
+        opts.querySelectorAll(".opt").forEach((o,i)=> {
+          if(g.options[i] === g.correct) o.classList.add("correct");
+          else if(i === oi) o.classList.add("incorrect");
+        });
+        feedback.className = "feedback show " + (isCorrect ? "ok" : "bad");
+        feedback.innerHTML = isCorrect ? "✅ إجابة صحيحة" : `❌ الإجابة الصحيحة: <strong>${g.correct}</strong>`;
+        updateScore();
+      };
+      opts.appendChild(opt);
+    });
+    card.appendChild(opts);
+    card.appendChild(feedback);
+
+    scoredItems.push({
+      type: "mcq",
+      examTitle,
+      prompt: g.prompt,
+      getValue: () => selectedIdx >= 0 ? g.options[selectedIdx] : "",
+      getIsCorrect: () => selectedIdx >= 0 && g.options[selectedIdx] === g.correct,
+      isAnswered: () => selectedIdx >= 0,
+    });
+    return card;
+  }
+
+  if(g.kind === "matchTerm"){
+    const qtext = document.createElement("div");
+    qtext.className = "q-text";
+    qtext.innerHTML = `<span class="txt">${g.prompt}</span>`;
+    card.appendChild(qtext);
+
+    const rowsWrap = document.createElement("div");
+    g.rows.forEach((row) => {
+      const rowEl = document.createElement("div");
+      rowEl.className = "match-row";
+      const stmt = document.createElement("div");
+      stmt.className = "stmt";
+      stmt.textContent = row.text;
+      const sel = document.createElement("select");
+      sel.className = "match-select";
+      sel.innerHTML = `<option value="">اختر...</option>` + g.options.map(o=>`<option value="${o}">${o}</option>`).join("");
+      sel.onchange = () => {
+        sel.classList.remove("correct","incorrect");
+        if(sel.value){
+          if(sel.value === row.correct) sel.classList.add("correct");
+          else sel.classList.add("incorrect");
+        }
+        updateScore();
+      };
+      rowEl.appendChild(stmt);
+      rowEl.appendChild(sel);
+      rowsWrap.appendChild(rowEl);
+
+      scoredItems.push({
+        type: "match",
+        examTitle,
+        prompt: g.prompt + " — " + row.text,
+        getValue: () => sel.value,
+        getIsCorrect: () => sel.value === row.correct,
+        isAnswered: () => !!sel.value,
+      });
+    });
+    card.appendChild(rowsWrap);
+    return card;
+  }
+
+  if(g.kind === "tf"){
+    const qtext = document.createElement("div");
+    qtext.className = "q-text";
+    qtext.innerHTML = `<span class="txt">${g.prompt}</span>`;
+    card.appendChild(qtext);
+
+    g.rows.forEach((row) => {
+      const rowWrap = document.createElement("div");
+      rowWrap.className = "tf-row";
+      const stmt = document.createElement("div");
+      stmt.className = "tf-stmt";
+      stmt.textContent = row.text;
+      const sel = document.createElement("select");
+      sel.className = "tf-select";
+      sel.innerHTML = `<option value="">اختر...</option><option value="صح">صح</option><option value="خطأ">خطأ</option>`;
+      const fb = document.createElement("div");
+      fb.className = "feedback";
+      sel.onchange = () => {
+        sel.classList.remove("correct","incorrect");
+        fb.className = "feedback";
+        if(sel.value){
+          const ok = sel.value === row.correct;
+          sel.classList.add(ok ? "correct" : "incorrect");
+          fb.className = "feedback show " + (ok ? "ok" : "bad");
+          fb.innerHTML = ok ? "✅ صحيح" : `❌ الإجابة الصحيحة: <strong>${row.correct}</strong>` +
+            (row.feedback ? `<span class="explain">${row.feedback}</span>` : "");
+        }
+        updateScore();
+      };
+      rowWrap.appendChild(stmt);
+      rowWrap.appendChild(sel);
+      rowWrap.appendChild(fb);
+      card.appendChild(rowWrap);
+
+      scoredItems.push({
+        type: "tf",
+        examTitle,
+        prompt: g.prompt + " — " + row.text,
+        getValue: () => sel.value,
+        getIsCorrect: () => sel.value === row.correct,
+        isAnswered: () => !!sel.value,
+      });
+    });
+    return card;
+  }
+
+  if(g.kind === "short"){
+    const qtext = document.createElement("div");
+    qtext.className = "q-text";
+    qtext.innerHTML = `<span class="txt">${g.prompt}</span>`;
+    card.appendChild(qtext);
+
+    const ta = document.createElement("textarea");
+    ta.className = "short-ans";
+    ta.placeholder = "اكتب إجابتك هنا...";
+    ta.addEventListener("input", () => updateScore());
+    card.appendChild(ta);
+
+    const note = document.createElement("div");
+    note.className = "manual-note";
+    note.textContent = "هذا السؤال يُصحح يدويًا بواسطة المدرّس. الإجابة النموذجية: " + (g.answer || "");
+    card.appendChild(note);
+
+    shortItems.push({
+      examTitle,
+      prompt: g.prompt,
+      modelAnswer: g.answer || "",
+      getValue: () => ta.value.trim(),
+      isAnswered: () => ta.value.trim().length > 0,
+    });
+    return card;
+  }
+
+  return card;
+}
+
+/* ---------- SCORE & PROGRESS ---------- */
+function getStats(){
+  const objectiveTotal = scoredItems.length;
+  const objectiveCorrect = scoredItems.filter(i => i.getIsCorrect()).length;
+  const objectiveAnswered = scoredItems.filter(i => i.isAnswered()).length;
+  const shortAnswered = shortItems.filter(i => i.isAnswered()).length;
+  const shortTotal = shortItems.length;
+  return { objectiveTotal, objectiveCorrect, objectiveAnswered, shortAnswered, shortTotal };
+}
+
+function getBadge(stats){
+  const { objectiveTotal, objectiveCorrect, shortAnswered, shortTotal } = stats;
+  const pct = objectiveTotal ? (objectiveCorrect / objectiveTotal) * 100 : 0;
+  if(objectiveAnswered === 0 && shortAnswered === 0) return { emoji: "🎯", label: "ابدأ الإجابة" };
+  if(pct === 100 && shortAnswered === shortTotal) return { emoji: "🏆", label: "ممتاز! أكملت كل شيء بنجاح" };
+  if(pct >= 80) return { emoji: "🌟", label: "أداء رائع!" };
+  if(pct >= 60) return { emoji: "👍", label: "جيد، كمّل كده" };
+  if(objectiveAnswered > 0) return { emoji: "💪", label: "استمر، راجع الإجابات الخاطئة" };
+  return { emoji: "🎯", label: "ابدأ الإجابة" };
+}
+
+function updateScore(){
+  const s = getStats();
+  const totalDisplay = s.objectiveTotal; // score mainly on objective
+  document.getElementById("scoreLabel").textContent = `${s.objectiveCorrect} / ${s.objectiveTotal}`;
+  const pct = s.objectiveTotal ? Math.round((s.objectiveCorrect / s.objectiveTotal) * 100) : 0;
+  document.getElementById("progressFill").style.width = pct + "%";
+
+  document.getElementById("finalScore").textContent = `${s.objectiveCorrect} / ${s.objectiveTotal}`;
+  const b = getBadge(s);
+  document.getElementById("badgeEmoji").textContent = b.emoji;
+  document.getElementById("badgeLabel").textContent = b.label;
+
+  const hint = document.getElementById("finalHint");
+  if(hint){
+    hint.textContent = `موضوعي: ${s.objectiveCorrect}/${s.objectiveTotal} صحيحة · إجابات قصيرة: ${s.shortAnswered}/${s.shortTotal}`;
+  }
+}
+
+/* ---------- NAME GATE ---------- */
+const gate = document.getElementById("gate");
+const appRoot = document.getElementById("appRoot");
+const nameInput = document.getElementById("nameInput");
+const nameErr = document.getElementById("nameErr");
+
+appRoot.style.display = "none";
+
+document.getElementById("startBtn").onclick = enterQuiz;
+nameInput.addEventListener("keydown", (e) => { if(e.key === "Enter") enterQuiz(); });
+
+function enterQuiz(){
+  const val = nameInput.value.trim();
+  if(!val){ nameErr.style.display = "block"; return; }
+  studentName = val;
+  gate.style.display = "none";
+  appRoot.style.display = "block";
+  document.getElementById("helloName").textContent = studentName;
+}
+
+/* ---------- TEACHER MODE ---------- */
+const teacherGate = document.getElementById("teacherGate");
+const teacherPassInput = document.getElementById("teacherPassInput");
+const teacherErr = document.getElementById("teacherErr");
+
+function openTeacherGate(){
+  if(teacherGate.classList.contains("show")) return;
+  gate.style.display = "none";
+  teacherGate.classList.add("show");
+  setTimeout(() => teacherPassInput.focus(), 50);
+}
+
+// Type "teacher" or "مدرس" anywhere
+let typedBuffer = "";
+const TRIGGER_WORDS = ["teacher", "مدرس"];
+window.addEventListener("keydown", (e) => {
+  if(e.key && e.key.length === 1 && document.activeElement.tagName !== "INPUT" && document.activeElement.tagName !== "TEXTAREA"){
+    typedBuffer = (typedBuffer + e.key).slice(-20);
+    if(TRIGGER_WORDS.some(w => typedBuffer.toLowerCase().includes(w))){
+      typedBuffer = "";
+      openTeacherGate();
+    }
+  }
+});
+
+// ?teacher=1
+try{
+  const urlParams = new URLSearchParams(location.search);
+  if(urlParams.get("teacher") === "1") openTeacherGate();
+} catch(e){}
+
+document.getElementById("teacherEnterBtn").onclick = tryTeacherLogin;
+teacherPassInput.addEventListener("keydown", (e) => {
+  e.stopPropagation();
+  if(e.key === "Enter") tryTeacherLogin();
+});
+
+function tryTeacherLogin(){
+  if(teacherPassInput.value === TEACHER_PASSCODE){
+    teacherErr.classList.remove("show");
+    teacherGate.style.display = "none";
+    studentName = "المدرّس";
+    openDashboard();
+  } else {
+    teacherErr.classList.add("show");
+  }
+}
+
+/* ---------- LOCAL STORAGE + SUBMIT ---------- */
+function loadResults(){
+  try{
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+  } catch(e){ return []; }
+}
+function saveResults(arr){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+}
+
+const submitBtn = document.getElementById("submitResultBtn");
+const submitStatus = document.getElementById("submitStatus");
+
+submitBtn.onclick = () => {
+  const s = getStats();
+  const record = {
+    name: studentName,
+    objectiveCorrect: s.objectiveCorrect,
+    objectiveTotal: s.objectiveTotal,
+    shortAnswered: s.shortAnswered,
+    shortTotal: s.shortTotal,
+    submittedAt: new Date().toLocaleString("ar-EG"),
+    answers: [
+      ...scoredItems.map(i => ({
+        exam: i.examTitle,
+        prompt: i.prompt,
+        response: i.getValue() || "(بدون إجابة)",
+        correct: i.getIsCorrect() ? "✓" : "✗",
+      })),
+      ...shortItems.map(i => ({
+        exam: i.examTitle,
+        prompt: i.prompt,
+        response: i.getValue() || "(بدون إجابة)",
+        correct: "يدوي",
+        model: i.modelAnswer,
+      })),
+    ],
+  };
+
+  submitStatus.className = "submit-status show";
+  submitStatus.textContent = "جاري الحفظ...";
+  submitBtn.disabled = true;
+
+  // Always save to localStorage
+  const all = loadResults();
+  all.push(record);
+  saveResults(all);
+
+  submitStatus.textContent = `✅ تم حفظ نتيجتك بنجاح: ${s.objectiveCorrect}/${s.objectiveTotal} موضوعي · ${s.shortAnswered}/${s.shortTotal} قصيرة`;
+  submitStatus.className = "submit-status show ok";
+  submitBtn.disabled = false;
+
+  // Optional: try Claude DB if present
+  if(typeof window.claude !== "undefined" && window.claude.use){
+    window.claude.use("db").then(db => {
+      if(db){
+        const key = studentName.replace(/[^a-zA-Z0-9\u0600-\u06FF]/g, "_") + "_" + Date.now();
+        db.collection("results").doc(key).set(record).catch(()=>{});
+      }
+    }).catch(()=>{});
+  }
+};
+
+/* ---------- TEACHER DASHBOARD ---------- */
+const dashboard = document.getElementById("dashboard");
+const dashContent = document.getElementById("dashContent");
+
+function openDashboard(){
+  appRoot.style.display = "none";
+  dashboard.classList.add("show");
+  loadDashboard();
+}
+document.getElementById("closeDashBtn").onclick = () => {
+  dashboard.classList.remove("show");
+  appRoot.style.display = "block";
+};
+document.getElementById("refreshDashBtn").onclick = loadDashboard;
+document.getElementById("clearDashBtn").onclick = () => {
+  if(confirm("هل أنت متأكد من مسح كل النتائج المحفوظة في هذا المتصفح؟")){
+    localStorage.removeItem(STORAGE_KEY);
+    loadDashboard();
+  }
+};
+
+function loadDashboard(){
+  dashContent.className = "empty";
+  dashContent.textContent = "جاري التحميل...";
+
+  const records = loadResults();
+  if(!records || records.length === 0){
+    dashContent.textContent = "لسه مفيش طلاب بعتوا نتايجهم في هذا المتصفح.";
+    return;
+  }
+  records.sort((a,b) => (b.submittedAt || "").localeCompare(a.submittedAt || ""));
+
+  dashContent.innerHTML = "";
+  records.forEach(r => {
+    const card = document.createElement("div");
+    card.className = "student-card";
+
+    const objScore = r.objectiveCorrect != null ? `${r.objectiveCorrect}/${r.objectiveTotal}` : (r.answered != null ? `${r.answered}/${r.total}` : "?");
+    const shortInfo = r.shortAnswered != null ? ` · قصيرة: ${r.shortAnswered}/${r.shortTotal}` : "";
+
+    const head = document.createElement("div");
+    head.className = "student-head";
+    head.innerHTML = `
+      <div>
+        <div class="name">${r.name}</div>
+        <div class="meta">${r.submittedAt || ""} — موضوعي: <span class="score">${objScore}</span>${shortInfo}</div>
+      </div>
+    `;
+    const answers = Array.isArray(r.answers) ? r.answers : [];
+    const toggleBtn = document.createElement("button");
+    toggleBtn.className = "toggle-answers-btn";
+    toggleBtn.textContent = answers.length ? `عرض كل الإجابات (${answers.length})` : "لا توجد إجابات";
+    if(!answers.length) toggleBtn.disabled = true;
+    head.appendChild(toggleBtn);
+    card.appendChild(head);
+
+    const panel = document.createElement("div");
+    panel.className = "answers-panel";
+    if(answers.length){
+      answers.forEach(a => {
+        const item = document.createElement("div");
+        item.className = "answer-item";
+        const corr = a.correct ? ` <span style="color:var(--teal-mid)">[${a.correct}]</span>` : "";
+        item.innerHTML = `
+          <div class="a-exam">${a.exam || ""}</div>
+          <div class="a-prompt">${a.prompt}${corr}</div>
+          <div class="a-response">${a.response}${a.model ? `<br><small style="color:var(--muted)">نموذجي: ${a.model}</small>` : ""}</div>
+        `;
+        panel.appendChild(item);
+      });
+    } else {
+      panel.innerHTML = `<div class="no-answers">لا توجد إجابات مسجّلة لهذا الطالب.</div>`;
+    }
+    card.appendChild(panel);
+    toggleBtn.onclick = () => panel.classList.toggle("show");
+    dashContent.appendChild(card);
+  });
+}
+</script>
+</body>
+</html>
